@@ -1,0 +1,166 @@
+CREATE DATABASE ooad;
+
+USE ooad;
+
+CREATE TABLE user (
+    User_id VARCHAR(20) PRIMARY KEY NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phoneNumber VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    role VARCHAR(6) NOT NULL,
+    balance INT NOT NULL
+);
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_user
+BEFORE INSERT ON user
+FOR EACH ROW
+BEGIN
+    DECLARE max_id VARCHAR(10);
+    DECLARE new_id INT;
+
+    -- Get the maximum existing ID
+    SELECT MAX(User_id) INTO max_id FROM user;
+
+    -- Extract the numeric part and increment it
+    IF max_id IS NOT NULL THEN
+        SET new_id = CAST(SUBSTRING(max_id, 4) AS UNSIGNED) + 1;
+    ELSE
+        SET new_id = 1;
+    END IF;
+
+    -- Concatenate the prefix with the new number
+    SET NEW.User_id = CONCAT('UID', LPAD(new_id, 3, '0'));
+END$$
+
+DELIMITER ;
+
+CREATE TABLE item (
+    Item_id VARCHAR(20) PRIMARY KEY NOT NULL,
+    User_id VARCHAR(20) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    size VARCHAR(255) NOT NULL,
+    price VARCHAR(255) NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    offer VARCHAR(255) NOT NULL,
+    updatedBy VARCHAR(255) NOT NULL,
+    CONSTRAINT `fk_item_userId`
+    FOREIGN KEY (User_id)
+    REFERENCES user (User_id)
+);
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_item
+BEFORE INSERT ON item
+FOR EACH ROW
+BEGIN
+    DECLARE max_id VARCHAR(10);
+    DECLARE new_id INT;
+
+    -- Get the maximum existing ID
+    SELECT MAX(Item_id) INTO max_id FROM item;
+
+    -- Extract the numeric part and increment it
+    IF max_id IS NOT NULL THEN
+        SET new_id = CAST(SUBSTRING(max_id, 4) AS UNSIGNED) + 1;
+    ELSE
+        SET new_id = 1;
+    END IF;
+
+    -- Concatenate the prefix with the new number
+    SET NEW.Item_id = CONCAT('IID', LPAD(new_id, 3, '0'));
+END$$
+
+DELIMITER ;
+
+CREATE TABLE transaction (
+    Transaction_id VARCHAR(20) PRIMARY KEY NOT NULL,
+    User_id VARCHAR(20) NOT NULL,
+    Item_id VARCHAR(20) NOT NULL,
+    CONSTRAINT `fk_transaction_userId`
+    FOREIGN KEY (User_id)
+    REFERENCES user (User_id),
+    CONSTRAINT `fk_transaction_itemId`
+    FOREIGN KEY (Item_id)
+    REFERENCES item (Item_id)
+);
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_transaction
+BEFORE INSERT ON transaction
+FOR EACH ROW
+BEGIN
+    DECLARE max_id VARCHAR(10);
+    DECLARE new_id INT;
+
+    -- Get the maximum existing ID
+    SELECT MAX(Transaction_id) INTO max_id FROM transaction;
+
+    -- Extract the numeric part and increment it
+    IF max_id IS NOT NULL THEN
+        SET new_id = CAST(SUBSTRING(max_id, 4) AS UNSIGNED) + 1;
+    ELSE
+        SET new_id = 1;
+    END IF;
+
+    -- Concatenate the prefix with the new number
+    SET NEW.Transaction_id = CONCAT('TID', LPAD(new_id, 3, '0'));
+END$$
+
+DELIMITER ;
+
+CREATE TABLE wishlist (
+    Wishlist_id VARCHAR(20) PRIMARY KEY NOT NULL,
+    User_id VARCHAR(20)NOT NULL,
+    Item_id VARCHAR(20)NOT NULL,
+    CONSTRAINT `fk_wishlist_userId`
+    FOREIGN KEY (User_id)
+    REFERENCES user (User_id),
+    CONSTRAINT `fk_wishlist_itemId`
+    FOREIGN KEY (Item_id)
+    REFERENCES item (Item_id)
+);
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_wishlist
+BEFORE INSERT ON wishlist
+FOR EACH ROW
+BEGIN
+    DECLARE max_id VARCHAR(10);
+    DECLARE new_id INT;
+
+    -- Get the maximum existing ID
+    SELECT MAX(Wishlist_id) INTO max_id FROM wishlist;
+
+    -- Extract the numeric part and increment it
+    IF max_id IS NOT NULL THEN
+        SET new_id = CAST(SUBSTRING(max_id, 4) AS UNSIGNED) + 1;
+    ELSE
+        SET new_id = 1;
+    END IF;
+
+    -- Concatenate the prefix with the new number
+    SET NEW.Wishlist_id = CONCAT('WID', LPAD(new_id, 3, '0'));
+END$$
+
+DELIMITER ;
+
+INSERT INTO user (username, password, phoneNumber, address, role, balance) VALUES ('buyer1', 'buyer1', '', '', 'Buyer', 100);
+INSERT INTO user (username, password, phoneNumber, address, role, balance) VALUES ('buyer2', 'buyer2', '', '', 'Buyer', 100);
+INSERT INTO user (username, password, phoneNumber, address, role, balance) VALUES ('seller1', 'seller1', '', '', 'Seller', 0);
+INSERT INTO user (username, password, phoneNumber, address, role, balance) VALUES ('seller2', 'seller2', '', '', 'Seller', 0);
+
+INSERT INTO item (User_id, name, category, size, price, status, offer, updatedBy) VALUES ('UID003', 'name1', 'category1', 'size1', '1', 'PENDING', '0', '');
+INSERT INTO item (User_id, name, category, size, price, status, offer, updatedBy) VALUES ('UID003', 'name2', 'category2', 'size2', '2', 'PENDING', '0', '');
+INSERT INTO item (User_id, name, category, size, price, status, offer, updatedBy) VALUES ('UID003', 'name3', 'category3', 'size3', '3', 'PENDING', '0', '');
+INSERT INTO item (User_id, name, category, size, price, status, offer, updatedBy) VALUES ('UID004', 'name4', 'category4', 'size4', '4', 'PENDING', '0', '');
+INSERT INTO item (User_id, name, category, size, price, status, offer, updatedBy) VALUES ('UID004', 'name5', 'category5', 'size5', '5', 'PENDING', '0', '');
+INSERT INTO item (User_id, name, category, size, price, status, offer, updatedBy) VALUES ('UID004', 'name6', 'category6', 'size6', '6', 'PENDING', '0', '');
+
+
